@@ -1,0 +1,17 @@
+[2023-06-09 11:13:03] [info]  [18060] Apache Commons Daemon procrun (1.2.2.0 64-bit) started.
+[2023-06-09 11:13:03] [info]  [18060] Deleting service...
+[2023-06-09 11:13:03] [error] [18060] The specified service does not exist as an installed service.
+[2023-06-09 11:13:03] [info]  [18060] Delete service finished.
+[2023-06-09 11:13:03] [error] [18060] Apache Commons Daemon procrun failed with exit value: 9 (failed to delete service).
+[2023-06-09 11:13:03] [error] [18060] The specified service does not exist as an installed service.
+[2023-06-09 11:13:13] [info]  [27496] Apache Commons Daemon procrun (1.2.2.0 64-bit) started.
+[2023-06-09 11:13:13] [info]  [27496] Installing service 'Tomcat8' name 'Apache Tomcat 8.5 Tomcat8'.
+[2023-06-09 11:13:13] [info]  [27496] Service 'Tomcat8' installed.
+[2023-06-09 11:13:13] [info]  [27496] Apache Commons Daemon procrun finished.
+[2023-06-09 11:14:33] [info]  [ 3012] Apache Commons Daemon procrun (1.2.2.0 64-bit) started.
+[2023-06-09 11:14:33] [info]  [ 3012] Debugging 'tomcat8' service...
+[2023-06-09 11:14:33] [info]  [ 3012] Starting service...
+[2023-06-09 11:14:35] [info]  [ 3012] Service started in 1249 milliseconds.
+[2023-06-09 11:15:10] [info]  [16648] Console CTRL+CLOSE event signaled.
+[2023-06-09 11:15:10] [info]  [16648] Stopping service...
+[2023-06-09 11:15:11] [info]  [16648] Service stop thread completed.
