@@ -1,0 +1,45 @@
+package com.highradius.servlets;
+
+import com.highradius.implementation.InvoiceDao;
+import com.highradius.implementation.InvoiceDaoImpl;
+import com.highradius.model.Invoice;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+public class AddServlet extends HttpServlet {
+    private InvoiceDao invoiceDao;
+
+    @Override
+    public void init() throws ServletException {
+        invoiceDao = new InvoiceDaoImpl();
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int customerOrderId = Integer.parseInt(request.getParameter("customerOrderId"));
+        String salesOrg = request.getParameter("salesOrg");
+        String distributionChannel = request.getParameter("distributionChannel");
+        String customerNumber = request.getParameter("customerNumber");
+        String companyCode = request.getParameter("companyCode");
+        String orderCurrency = request.getParameter("orderCurrency");
+        double amountInUsd = Double.parseDouble(request.getParameter("amountInUsd"));
+        String orderCreationTime = request.getParameter("orderCreationTime");
+
+        Invoice invoice = new Invoice(customerOrderId);
+        invoice.setCustomerOrderId(customerOrderId);
+        invoice.setSalesOrg(salesOrg);
+        invoice.setDistributionChannel(distributionChannel);
+        invoice.setCustomerNumber(customerNumber);
+        invoice.setCompanyCode(companyCode);
+        invoice.setOrderCurrency(orderCurrency);
+        invoice.setAmountInUsd(amountInUsd);
+        invoice.setOrderCreationTime(orderCreationTime);
+
+        invoiceDao.insertInvoice(invoice);
+
+        response.sendRedirect(request.getContextPath() + "/add-invoice.html");
+    }
+}

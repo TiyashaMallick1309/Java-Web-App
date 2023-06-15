@@ -1,0 +1,37 @@
+package com.highradius.servlets;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.highradius.implementation.InvoiceDaoImpl;
+import com.highradius.model.Invoice;
+
+public class AddInvoiceServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Extract the invoice data from the request parameters
+        String invoiceNumber = request.getParameter("invoiceNumber");
+        // Extract other invoice fields
+
+        // Create an instance of the Invoice class with the extracted data
+        Invoice invoice = new Invoice(invoiceNumber, /* other fields */);
+
+        // Create an instance of the InvoiceDao implementation
+        InvoiceDaoImpl invoiceDao = new InvoiceDaoImpl();
+
+        // Insert the invoice into the database using the DAO
+        boolean success = invoiceDao.insertInvoice(invoice);
+
+        // Create a JSON response indicating the success or failure of the operation
+        String jsonResponse = "{\"success\":" + success + "}";
+
+        // Set response content type to "application/json"
+        response.setContentType("application/json");
+
+        // Write the JSON response
+        response.getWriter().write(jsonResponse);
+    }
+}

@@ -1,0 +1,32 @@
+package com.highradius.servlets;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.highradius.implementation.InvoiceDaoImpl;
+import com.highradius.model.Invoice;
+
+public class ReadInvoiceServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Create an instance of the InvoiceDao implementation
+        InvoiceDaoImpl invoiceDao = new InvoiceDaoImpl();
+
+        // Retrieve the list of invoices from the database using the DAO
+        List<Invoice> invoices = invoiceDao.getInvoice();
+
+        // Convert the list of invoices to JSON using Jackson ObjectMapper
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonInvoices = mapper.writeValueAsString(invoices);
+
+        // Set response content type to "application/json"
+        response.setContentType("application/json");
+
+        // Write the JSON response
+        response.getWriter().write(jsonInvoices);
+    }
+}

@@ -1,0 +1,34 @@
+package com.highradius.implementation;
+
+import com.highradius.model.Invoice;
+import com.highradius.connection.DatabaseConnection;
+import java.util.List;
+
+public class InvoiceDaoImpl implements InvoiceDao {
+
+    private DatabaseConnection databaseConnection;
+
+    public InvoiceDaoImpl() {
+        databaseConnection = new DatabaseConnection();
+    }
+
+    @Override
+    public List<Invoice> getInvoices() {
+        return databaseConnection.getInvoices();
+    }
+
+    @Override
+    public void insertInvoice(Invoice invoice) {
+        databaseConnection.addInvoice(invoice);
+    }
+
+    @Override
+    public void updateInvoice(int id, Invoice updatedInvoice) {
+        // Implement the update logic as per your requirement
+    }
+
+    @Override
+    public void deleteInvoice(int id) {
+        // Implement the delete logic as per your requirement
+    }
+}

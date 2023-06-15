@@ -1,0 +1,15 @@
+1686236140862	Delete element
+1686236600793	Rename type 'AddServlet'
+1686236616252	Rename type 'DeleteServlet'
+1686236625693	Rename type 'EditServlet'
+1686236639197	Rename type 'ReadServlet'
+1686253805320	Delete element
+1686253856392	Rename package 'h2h_milestone_3'
+1686255192328	Delete element
+1686295965216	Delete element
+1686300647153	Delete element
+1686318849784	Rename compilation unit 'InvoiceDaolmpl.java'
+1686322982874	Encapsulate field 'SELECT_ALL_INVOICES'
+1686323000397	Encapsulate field 'INSERT_INVOICE'
+1686334878828	Delete element
+1686334883864	Delete element

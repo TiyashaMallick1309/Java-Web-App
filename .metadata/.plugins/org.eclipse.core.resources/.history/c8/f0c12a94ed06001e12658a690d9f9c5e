@@ -1,0 +1,58 @@
+package com.highradius.model;
+
+public class Invoice {
+    private int id;
+    private String nm;
+    private double amt;
+
+    public Invoice(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+	public void setCustomerOrderId(int id) {
+		this.id = id;	
+	}
+
+	public void setSalesOrg(String nm) {
+		this.nm = nm;
+		
+	}
+
+	public void setDistributionChannel(String nm) {
+		this.nm = nm;
+		
+	}
+
+	public void setCustomerNumber(String nm) {
+		this.nm = nm;
+		
+	}
+
+	public void setCompanyCode(String nm) {
+		this.nm = nm;
+		
+	}
+
+	public void setOrderCurrency(String nm) {
+		this.nm = nm;
+		
+	}
+
+	public void setAmountInUsd(double amt) {
+		this.amt = amt;
+		
+	}
+
+	public void setOrderCreationTime(String nm) {
+		this.nm = nm;
+		
+	}
+}
