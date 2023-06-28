@@ -1,90 +1,60 @@
 package com.highradius.servlets;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.highradius.implementation.InvoiceDaoImpl;
+import com.highradius.model.Invoice;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import com.highradius.connection.DatabaseConnection;
-import com.highradius.implementation.InvoiceDao;
-import com.highradius.implementation.InvoiceDaoImpl;
-import com.highradius.model.Invoice;
+@WebServlet("/AddServlet")
+public class AddServlet extends HttpServlet 
+{
+    private static final long serialVersionUID = 1L;
 
-/**
- * Servlet implementation class AddServlet
- */
-@WebServlet("/addservlet")
-public class AddServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+    {
+    	  // Retrieve the values from the form using request.getParameter()
 
-	private static final long serialVersionUID = 1L;
+    	  int slNo = Integer.parseInt(request.getParameter("slNo"));
+    	  int customerOrderId = Integer.parseInt(request.getParameter("customerOrderId"));
+    	  int salesOrg = Integer.parseInt(request.getParameter("salesOrg"));
+    	  String distributionChannel = request.getParameter("distributionChannel");
+    	  String division = request.getParameter("division");
+    	  double releasedCreditValue = Double.parseDouble(request.getParameter("releasedCreditValue"));
+    	  String purchaseOrderType = request.getParameter("purchaseOrderType");
+    	  int companyCode = Integer.parseInt(request.getParameter("companyCode"));
+    	  String orderCreationDate = request.getParameter("orderCreationDate");
+    	  String orderCreationTime = request.getParameter("orderCreationTime");
+    	  String creditControlArea = request.getParameter("creditControlArea");
+    	  int soldToParty = Integer.parseInt(request.getParameter("soldToParty"));
+    	  double orderAmount = Double.parseDouble(request.getParameter("orderAmount"));
+    	  String requestedDeliveryDate = request.getParameter("requestedDeliveryDate");
+    	  String orderCurrency = request.getParameter("orderCurrency");
+    	  String creditStatus = request.getParameter("creditStatus");
+    	  int customerNumber = Integer.parseInt(request.getParameter("customerNumber"));
+    	  double amountInUsd = Double.parseDouble(request.getParameter("amountInUsd"));
+    	  long uniqueCustId = Long.parseLong(request.getParameter("uniqueCustId"));
 
-	public AddServlet() {
-		super();
-	}
+    	  Invoice invoice = new Invoice(slNo, customerOrderId, salesOrg, distributionChannel, division, releasedCreditValue, purchaseOrderType,
+    			    companyCode, orderCreationDate, orderCreationTime, creditControlArea, soldToParty, orderAmount, requestedDeliveryDate,
+    			    orderCurrency, creditStatus, customerNumber, amountInUsd, uniqueCustId);
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-		doPost(request, response);
-	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		Connection status = DatabaseConnection.Connect();
+          InvoiceDaoImpl invoiceDao = new InvoiceDaoImpl();
+          invoiceDao.addInvoice(invoice);
 
-		if (status != null) {
-			System.out.println("Connection to the Database established!Ad");
-		}
-
-		int slNo = Integer.parseInt(request.getParameter("slNo"));
-		int customerOrderID = Integer.parseInt(request.getParameter("customerOrderID"));
-		int salesOrg = Integer.parseInt(request.getParameter("salesOrg"));
-		String distributionChannel = request.getParameter("distributionChannel");
-		int customerNumber = Integer.parseInt(request.getParameter("customerNumber"));
-		int companyCode = Integer.parseInt(request.getParameter("companyCode"));
-		String orderCurrency = request.getParameter("orderCurrency");
-		double amountInUSD = Double.parseDouble(request.getParameter("amountInUSD"));
-		double orderAmount = Double.parseDouble(request.getParameter("orderAmount"));
-		String orderCreationDateStr = request.getParameter("orderCreationDate");
-
-		// Parse orderCreationDate string to Date object
-		Date orderCreationDate = null;
-		try {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			orderCreationDate = dateFormat.parse(orderCreationDateStr);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-
-		// Call addInvoice function
-		addInvoice(slNo, customerOrderID, salesOrg, distributionChannel, customerNumber, companyCode, orderCurrency,
-				amountInUSD, orderAmount, orderCreationDate);
-	}
-
-	// Method addInvoice with void return type to Add Invoice data using InvoiceDao
-	protected static void addInvoice(int slNo, int customerOrderID, int salesOrg, String distributionChannel,
-			int customerNumber, int companyCode, String orderCurrency, double amountInUSD, double orderAmount,
-			Date orderCreationDate) {
-		// Create a new object of Invoice and initialize with the specified values
-		final Invoice newInvoice = new Invoice(slNo, customerOrderID, salesOrg, distributionChannel, customerNumber,
-				companyCode, orderCurrency, amountInUSD, orderAmount, orderCreationDate);
-
-		// Create an instance of InvoiceDao
-		InvoiceDao invoiceDao = new InvoiceDaoImpl();
-
-		// insertInvoice method from InvoiceDao
-		invoiceDao.insertInvoice(newInvoice);
-
-	}
-}
+          // Redirect back to the original HTML form page
+          response.sendRedirect("text.html");
+          System.out.println("Database updated");
+          
+          String classpath = System.getProperty("java.class.path");
+          System.out.println("Classpath: " + classpath);
+          
+          
+          invoiceDao.getInvoices();                
+              	}
+   }

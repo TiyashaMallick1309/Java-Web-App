@@ -1,186 +1,174 @@
 package com.highradius.implementation;
 
-import com.highradius.model.Invoice;
 import com.highradius.connection.DatabaseConnection;
+import com.highradius.model.Invoice;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
-public class InvoiceDaoImpl implements InvoiceDao {
+public class InvoiceDaoImpl implements InvoiceDao 
+{
 
-	// Initializing Properties
-	private Connection connection = null;
-	private Statement queryStatement = null;
-	private PreparedStatement prepStatement = null;
-	private ResultSet rs = null;
+    private static final String GET_INVOICES = "SELECT * FROM h2h_oap LIMIT 10000";
+    private static final String ADD_INVOICE = "INSERT INTO h2h_oap (Sl_no,CUSTOMER_ORDER_ID, SALES_ORG, DISTRIBUTION_CHANNEL, DIVISION, RELEASED_CREDIT_VALUE, PURCHASE_ORDER_TYPE, COMPANY_CODE, ORDER_CREATION_DATE, ORDER_CREATION_TIME, CREDIT_CONTROL_AREA, SOLD_TO_PARTY, ORDER_AMOUNT, REQUESTED_DELIVERY_DATE, ORDER_CURRENCY, CREDIT_STATUS, CUSTOMER_NUMBER, AMOUNT_IN_USD, UNIQUE_CUST_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String UPDATE_INVOICE = "UPDATE h2h_oap SET Sl_no=?,CUSTOMER_ORDER_ID=?, SALES_ORG=?, DISTRIBUTION_CHANNEL=?, DIVISION=?, RELEASED_CREDIT_VALUE=?, PURCHASE_ORDER_TYPE=?, COMPANY_CODE=?, ORDER_CREATION_DATE=?, ORDER_CREATION_TIME=?, CREDIT_CONTROL_AREA=?, SOLD_TO_PARTY=?, ORDER_AMOUNT=?, REQUESTED_DELIVERY_DATE=?, ORDER_CURRENCY=?, CREDIT_STATUS=?, CUSTOMER_NUMBER=?, AMOUNT_IN_USD=?, UNIQUE_CUST_ID=? WHERE Sl_no=?";
+    private static final String DELETE_INVOICE = "DELETE FROM h2h_oap WHERE Sl_no=?";
 
-	// Method to call DatabaseConnection addInvoice method
-	@Override
-	public void insertInvoice(Invoice invoice) {
+    @Override
+    public void addInvoice(Invoice invoice) 
+    {
+        try (Connection conn = DatabaseConnection.getConnection();
+        	PreparedStatement stmt = conn.prepareStatement(ADD_INVOICE)) 
+        {
+            stmt.setInt(1, invoice.getslNo());
+            stmt.setInt(2, invoice.getCustomerOrderId());
+            stmt.setInt(3, invoice.getSalesOrg());
+            stmt.setString(4, invoice.getDistributionChannel());
+            stmt.setString(5, invoice.getDivision());
+            stmt.setDouble(6, invoice.getReleasedCreditValue());
+            stmt.setString(7, invoice.getPurchaseOrderType());
+            stmt.setInt(8, invoice.getCompanyCode());
+            stmt.setString(9, invoice.getOrderCreationDate());
+            stmt.setString(10, invoice.getOrderCreationTime());
+            stmt.setString(11, invoice.getCreditControlArea());
+            stmt.setInt(12, invoice.getSoldToParty());
+            stmt.setDouble(13, invoice.getOrderAmount());
+            stmt.setString(14, invoice.getRequestedDeliveryDate());
+            stmt.setString(15, invoice.getOrderCurrency());
+            stmt.setString(16, invoice.getCreditStatus());
+            stmt.setInt(17, invoice.getCustomerNumber());
+            stmt.setDouble(18, invoice.getAmountInUSD());
+            stmt.setLong(19, invoice.getUniqueCustId());
 
-		// Creating Statement
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection status = DatabaseConnection.Connect();
+            stmt.executeUpdate();
+        
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+    }
+    
 
-			if (status != null) {
-				System.out.println("Connection to the Database established!IMPL");
-			}
+    @Override
+    public List<Invoice> getInvoices() {
+        List<Invoice> invoices = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(GET_INVOICES);
+             ResultSet rs = stmt.executeQuery()) {
 
-			String query = "INSERT INTO h2h_oap VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            while (rs.next()) {
+                Invoice invoice = new Invoice();
+                invoice.setslNo(rs.getInt("Sl_no"));
+                invoice.setCustomerOrderId(rs.getInt("CUSTOMER_ORDER_ID"));
+                invoice.setSalesOrg(rs.getInt("SALES_ORG"));
+                invoice.setDistributionChannel(rs.getString("DISTRIBUTION_CHANNEL"));
+                invoice.setDivision(rs.getString("DIVISION"));
+                invoice.setReleasedCreditValue(rs.getDouble("RELEASED_CREDIT_VALUE"));
+                invoice.setPurchaseOrderType(rs.getString("PURCHASE_ORDER_TYPE"));
+                invoice.setCompanyCode(rs.getInt("COMPANY_CODE"));
+                invoice.setOrderCreationDate(rs.getString("ORDER_CREATION_DATE"));
+                invoice.setOrderCreationTime(rs.getString("ORDER_CREATION_TIME"));
+                invoice.setCreditControlArea(rs.getString("CREDIT_CONTROL_AREA"));
+                invoice.setSoldToParty(rs.getInt("SOLD_TO_PARTY"));
+                invoice.setOrderAmount(rs.getDouble("ORDER_AMOUNT"));
+                invoice.setRequestedDeliveryDate(rs.getString("REQUESTED_DELIVERY_DATE"));
+                invoice.setOrderCurrency(rs.getString("ORDER_CURRENCY"));
+                invoice.setCreditStatus(rs.getString("CREDIT_STATUS"));
+                invoice.setCustomerNumber(rs.getInt("CUSTOMER_NUMBER"));
+                invoice.setAmountInUSD(rs.getDouble("AMOUNT_IN_USD"));
+                invoice.setUniqueCustId(rs.getLong("UNIQUE_CUST_ID"));
 
-			prepStatement = connection.prepareStatement(query);
+                invoices.add(invoice);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return invoices;
+    }
 
-			prepStatement.setInt(1, invoice.getSlNo());
-			prepStatement.setInt(2, invoice.getCustomerOrderID());
-			prepStatement.setInt(3, invoice.getSalesOrg());
-			prepStatement.setString(4, invoice.getDistributionChannel());
-			prepStatement.setInt(5, invoice.getCustomerNumber());
-			prepStatement.setInt(6, invoice.getCompanyCode());
-			prepStatement.setString(7, invoice.getOrderCurrency());
-			prepStatement.setDouble(8, invoice.getAmountInUSD());
-			prepStatement.setDouble(9, invoice.getOrderAmount());
-			prepStatement.setDate(10, new java.sql.Date(invoice.getOrderCreationDate().getTime()));
+    @Override
+    public void deleteInvoice(int id) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(DELETE_INVOICE)) {
 
-			// Execute the INSERT statement
-			prepStatement.executeUpdate();
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-			// Adding to the list in dbConnection object
-			DatabaseConnection.addInvoice(invoice);
+    public static int updateInvoice(Invoice invoice) {
+    	int status = 0;
+    
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(UPDATE_INVOICE)) {
 
-			System.out.println("Row added successfully!"); // Displaying row was added
-		} catch (Exception e) {
+            stmt.setInt(1, invoice.getCustomerOrderId());
+            stmt.setInt(2, invoice.getSalesOrg());
+            stmt.setString(3, invoice.getDistributionChannel());
+            stmt.setString(4, invoice.getDivision());
+            stmt.setDouble(5, invoice.getReleasedCreditValue());
+            stmt.setString(6, invoice.getPurchaseOrderType());
+            stmt.setInt(7, invoice.getCompanyCode());
+            stmt.setString(8, invoice.getOrderCreationDate());
+            stmt.setString(9, invoice.getOrderCreationTime());
+            stmt.setString(10, invoice.getCreditControlArea());
+            stmt.setInt(11, invoice.getSoldToParty());
+            stmt.setDouble(12, invoice.getOrderAmount());
+            stmt.setString(13, invoice.getRequestedDeliveryDate());
+            stmt.setString(14, invoice.getOrderCurrency());
+            stmt.setString(15, invoice.getCreditStatus());
+            stmt.setInt(16, invoice.getCustomerNumber());
+            stmt.setDouble(17, invoice.getAmountInUSD());
+            stmt.setLong(18, invoice.getUniqueCustId());
 
-			e.printStackTrace();
-		}
-	}
+            stmt.executeUpdate();
+        }catch(Exception ex){ex.printStackTrace();}  
+        
+        return status;  
+    }  
+    
 
-	@Override
-	// Method to call DatabaseConnection getInvoices method
-	public List<Invoice> getInvoice() {
-
-		// Creating Statement
-		try {
-
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection status = DatabaseConnection.Connect();
-
-			if (status != null) {
-				System.out.println("Connection to the Database established!IMPL");
-			}
-
-			queryStatement = connection.createStatement();
-
-			// Executing Query
-			rs = queryStatement.executeQuery("Select * FROM h2h_oap");
-			int count = 0; // To count the total no of rows added
-
-			// Iterating through rows of the table
-			while (rs.next()) {
-				String creationdate = rs.getString(9);
-				DateFormat df = new SimpleDateFormat("dd-mm-yyyy");
-				Date orderCreationDate = df.parse(creationdate);
-
-				// Creating an Invoice class object with data from table
-				Invoice inv = new Invoice(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getString(4), rs.getInt(17),
-						rs.getInt(8), rs.getString(15), rs.getInt(18), rs.getInt(13), orderCreationDate);
-
-				// Adding the Invoice object 'inv' to the list of invoices
-				DatabaseConnection.addInvoice(inv);
-
-				// Incrementing the value of count each time
-				count++;
-				System.out.println(count + " rows loaded successfully!"); // Displaying how many total rows were added
-			}
-		} catch (ParseException e) {
-
-			e.printStackTrace();
-		} catch (SQLException e) {
-
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-
-			e.printStackTrace();
-		}
-		// Returning the list from dbConnection object
-		return DatabaseConnection.getInvoices();
-	}
-
-	// Method to update invoice
-	@Override
-	public void updateInvoice(int id, Invoice invoice) {
-
-		// Creating Statement
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection status = DatabaseConnection.Connect();
-
-			if (status != null) {
-				System.out.println("Connection to the Database established!IMPL");
-			}
-
-			String query = "UPDATE invoices SET " + "customer_order_id = ?, " + "sales_org = ?, "
-					+ "distribution_channel = ?, " + "customer_number = ?, " + "company_code = ?, "
-					+ "order_currency = ?, " + "amount_in_usd = ?, " + "order_amount = ?, " + "order_creation_date = ? "
-					+ "WHERE sl_no = ?";
-
-			prepStatement = connection.prepareStatement(query);
-
-			prepStatement.setInt(1, invoice.getCustomerOrderID());
-			prepStatement.setInt(2, invoice.getSalesOrg());
-			prepStatement.setString(3, invoice.getDistributionChannel());
-			prepStatement.setInt(4, invoice.getCustomerNumber());
-			prepStatement.setInt(5, invoice.getCompanyCode());
-			prepStatement.setString(6, invoice.getOrderCurrency());
-			prepStatement.setDouble(7, invoice.getAmountInUSD());
-			prepStatement.setDouble(8, invoice.getOrderAmount());
-			prepStatement.setDate(9, new java.sql.Date(invoice.getOrderCreationDate().getTime()));
-			prepStatement.setInt(10, id);
-
-			// Execute the INSERT statement
-			prepStatement.executeUpdate();
-
-			System.out.println("Row modified successfully!"); // Displaying row was modified
-		} catch (Exception e) {
-
-			e.printStackTrace();
-		}
-	}
-
-	// Method to delete invoice
-	@Override
-	public void deleteInvoice(int id) {
-
-		// Creating Statement
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection status = DatabaseConnection.Connect();
-
-			if (status != null) {
-				System.out.println("Connection to the Database established!IMPL");
-			}
-
-			String query = "DELETE FROM h2h_oap WHERE sl_no=?;";
-
-			prepStatement = connection.prepareStatement(query);
-
-			prepStatement.setInt(1, id);
-
-			// Execute the INSERT statement
-			prepStatement.executeUpdate();
-
-			System.out.println("Row deleted successfully!"); // Displaying row was deleted
-		} catch (Exception e) {
-
-			e.printStackTrace();
-		}
-	}
+    
+    @Override
+    public Invoice getInvoiceById(int invoiceId) {
+        Invoice invoice = null;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(GET_INVOICES)) {
+            stmt.setInt(1, invoiceId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    invoice = new Invoice();
+                    invoice.setslNo(rs.getInt("Sl_no"));
+                    invoice.setCustomerOrderId(rs.getInt("CUSTOMER_ORDER_ID"));
+                    invoice.setSalesOrg(rs.getInt("SALES_ORG"));
+                    invoice.setDistributionChannel(rs.getString("DISTRIBUTION_CHANNEL"));
+                    invoice.setDivision(rs.getString("DIVISION"));
+                    invoice.setReleasedCreditValue(rs.getDouble("RELEASED_CREDIT_VALUE"));
+                    invoice.setPurchaseOrderType(rs.getString("PURCHASE_ORDER_TYPE"));
+                    invoice.setCompanyCode(rs.getInt("COMPANY_CODE"));
+                    invoice.setOrderCreationDate(rs.getString("ORDER_CREATION_DATE"));
+                    invoice.setOrderCreationTime(rs.getString("ORDER_CREATION_TIME"));
+                    invoice.setCreditControlArea(rs.getString("CREDIT_CONTROL_AREA"));
+                    invoice.setSoldToParty(rs.getInt("SOLD_TO_PARTY"));
+                    invoice.setOrderAmount(rs.getDouble("ORDER_AMOUNT"));
+                    invoice.setRequestedDeliveryDate(rs.getString("REQUESTED_DELIVERY_DATE"));
+                    invoice.setOrderCurrency(rs.getString("ORDER_CURRENCY"));
+                    invoice.setCreditStatus(rs.getString("CREDIT_STATUS"));
+                    invoice.setCustomerNumber(rs.getInt("CUSTOMER_NUMBER"));
+                    invoice.setAmountInUSD(rs.getDouble("AMOUNT_IN_USD"));
+                    invoice.setUniqueCustId(rs.getLong("UNIQUE_CUST_ID"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return invoice;
+    }
 }
